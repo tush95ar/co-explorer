@@ -66,9 +66,9 @@ function pageGeo(kind, key) {
 
   const sub = kind === 'borough' ? 'Borough' : `${ENT[kind].one} in ${entLink('borough', boro)}`;
   const compareIds = kind === 'borough' ? DICT.boro.map((_, b) => DICT.boro[b]) : [ENT[kind].key(k), ...similar(kind, k, 3).map(x => ENT[kind].key(x.k))];
-  const right = `<div class="toolbar" style="margin:0">
-      <a class="btn" style="line-height:28px" href="${link('/compare', { kind, ids: compareIds.join('|') })}">${kind === 'borough' ? 'Compare all boroughs' : 'Compare with similar'}</a>
-      <a class="btn" style="line-height:28px" href="${link('/explorer', { scope: `${kind}:${ENT[kind].key(k)}` })}">Open rows in Explorer</a></div>`;
+  const right = `<div class="toolbar flush">
+      ${btn({ label: kind === 'borough' ? 'Compare all boroughs' : 'Compare with similar', href: link('/compare', { kind, ids: compareIds.join('|') }) })}
+      ${btn({ label: 'Open rows in Explorer', href: link('/explorer', { scope: `${kind}:${ENT[kind].key(k)}` }) })}</div>`;
   let html = head(esc(name), sub, right);
   if (!rows.length) return html + emptyState();
   const kk = kpis(rows);
@@ -170,7 +170,7 @@ function pageStreet(key) {
   const scope = { scope: `street:${DICT.stNorm[k]}` };
   const boros = sortedEntries(countBy(all, C.boro)).map(([b]) => entLink('borough', b)).join(', ');
   let html = head(esc(DICT.stDisplay[k]), `Street in ${boros} · normalized key <code>${esc(DICT.stNorm[k])}</code>`,
-    `<a class="btn" style="line-height:28px" href="${link('/explorer', scope)}">Open rows in Explorer</a>`);
+    btn({ label: 'Open rows in Explorer', href: link('/explorer', scope) }));
   if (!rows.length) return html + emptyState();
   html += kpiTiles(kpis(rows), { links: { cos: link('/explorer', scope) } });
   const t = T(); const trendId = nid('c'), boId = nid('c');
@@ -251,8 +251,8 @@ function pageBuilding(key) {
   setCrumbs([...geoChainForRows(all), { label: bldAddr(b) }]);
   const addr = bldAddr(b);
   let html = head(esc(addr), `${entLink('borough', C.boro[i0])} · BIN ${BLD.bin[b]} · ${entLink('street', C.stn[i0], 'Street: ' + DICT.stDisplay[C.stn[i0]])}`,
-    `<div class="toolbar" style="margin:0"><a class="btn" style="line-height:28px" href="${link('/compare', { kind: 'building', ids: String(BLD.bin[b]) })}">Compare…</a><a class="btn" style="line-height:28px" href="${link('/explorer', { scope: 'building:' + BLD.bin[b] })}">Open rows in Explorer</a></div>`);
-  const filteredNote = rows.length < all.length ? `<p class="callout">Showing ${fmt(rows.length)} of ${fmt(all.length)} certificates at this building because global filters are active. <button class="linkbtn" data-reset>Clear filters</button></p>` : '';
+    `<div class="toolbar flush">${btn({ label: 'Compare…', href: link('/compare', { kind: 'building', ids: String(BLD.bin[b]) }) })}${btn({ label: 'Open rows in Explorer', href: link('/explorer', { scope: 'building:' + BLD.bin[b] }) })}</div>`);
+  const filteredNote = rows.length < all.length ? `<p class="callout">Showing ${fmt(rows.length)} of ${fmt(all.length)} certificates at this building because global filters are active. ${btn({ label: 'Clear filters', variant: 'ghost', size: 'sm', attrs: 'data-reset' })}</p>` : '';
   html += filteredNote;
   const k = kpis(rows.length ? rows : all);
   const t = T();
@@ -351,9 +351,9 @@ function pageCert(key) {
   const reused = META.reusedApplicationNumbers.includes(certKey(i).slice(0, 12));
   const siblings = Array.from(rowsOf('building', b)).sort((a, c) => C.iss[a] - C.iss[c]);
   const pos = siblings.indexOf(i);
-  const nav = `<div class="toolbar" style="margin:0">
-    ${pos > 0 ? `<a class="btn" style="line-height:28px" href="${certHref(siblings[pos - 1])}">← Previous at building</a>` : ''}
-    ${pos < siblings.length - 1 ? `<a class="btn" style="line-height:28px" href="${certHref(siblings[pos + 1])}">Next at building →</a>` : ''}</div>`;
+  const nav = `<div class="toolbar flush">
+    ${pos > 0 ? btn({ label: 'Previous at building', icon: '←', href: certHref(siblings[pos - 1]) }) : ''}
+    ${pos < siblings.length - 1 ? btn({ label: 'Next at building', iconRight: '→', href: certHref(siblings[pos + 1]) }) : ''}</div>`;
   const f = (l, v) => `<dt>${esc(l)}</dt><dd>${v}</dd>`;
   const raw = `<dl class="facts">
     ${f('Application number', `${certKey(i)}${reused ? ' <span class="tag">application number shared with another certificate</span>' : ''}`)}
@@ -577,8 +577,8 @@ function pageCompare() {
     <label class="muted">Type <select class="ctl" id="cmpKind">${COMPARE_KINDS.map(k => `<option value="${k}"${k === kind ? ' selected' : ''}>${ENT[k].many}</option>`).join('')}</select></label>
     <input class="ctl" id="cmpAdd" list="${listId}" placeholder="${kind === 'building' ? 'Type a BIN' : 'Add ' + ENT[kind].one.toLowerCase() + '…'}" style="max-width:260px" ${ents.length >= 4 ? 'disabled' : ''}>
     <datalist id="${listId}">${options}</datalist>
-    <button class="btn primary" id="cmpAddBtn" ${ents.length >= 4 ? 'disabled' : ''}>Add</button>
-    ${ents.map((e, n) => `<span class="chip"><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${T().s[n]}"></i>${esc(ENT[kind].name(e.k))}<button aria-label="Remove" data-cmp-rm="${n}">×</button></span>`).join('')}
+    ${btn({ label: 'Add', variant: 'primary', attrs: `id="cmpAddBtn"${ents.length >= 4 ? ' disabled' : ''}` })}
+    ${ents.map((e, n) => `<span class="chip"><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${T().s[n]}"></i>${esc(ENT[kind].name(e.k))}${btn({ label: `Remove ${esc(ENT[kind].name(e.k))}`, variant: 'ghost', size: 'sm', iconOnly: true, icon: '×', attrs: `data-cmp-rm="${n}"` })}</span>`).join('')}
   </div>`;
   onMount(() => {
     const add = () => {
@@ -667,9 +667,9 @@ function pageExplorer() {
   let html = head('Data explorer', `${fmt(rows.length)} of ${fmt(N)} certificates match`) + scopeBanner(sc, '/explorer');
   html += `<div class="toolbar">
     <input type="search" class="ctl" id="expQ" placeholder="Filter rows: address, BIN, job, CO…" value="${esc(ROUTE.q.q || '')}" aria-label="Filter rows">
-    <div class="colchooser"><button class="btn" id="colBtn" aria-expanded="false">Columns (${cols.length})</button>
+    <div class="colchooser">${btn({ label: `Columns (${cols.length})`, attrs: 'id="colBtn" aria-expanded="false" aria-controls="colMenu"' })}
       <div class="menu" id="colMenu" hidden>${EXP_COLS.map(c => `<label><input type="checkbox" value="${c.key}"${EXP_VISIBLE.includes(c.key) ? ' checked' : ''}> ${esc(c.label)}</label>`).join('')}</div></div>
-    <button class="btn" id="expCsv">Export CSV (${fmt(rows.length)} rows)</button>
+    ${btn({ label: `Export CSV (${fmt(rows.length)} rows)`, icon: '↓', attrs: 'id="expCsv"' })}
   </div><div id="expTable"></div><p class="note">Click a column header to sort. Every ID links to its page.</p>`;
   onMount(() => {
     const el = document.getElementById('expTable');
@@ -688,13 +688,21 @@ function pageExplorer() {
       try { localStorage.setItem('coex-cols', JSON.stringify(EXP_VISIBLE)); } catch (e) {}
       render();
     });
-    document.getElementById('expCsv').addEventListener('click', () => {
-      const cell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-      const lines = [cols.map(c => cell(c.label)).join(',')];
-      for (const i of rows) lines.push(cols.map(c => cell(c.csv ? c.csv(i) : c.get(i))).join(','));
-      const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `co_explorer_${rows.length}_rows.csv`; a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    document.getElementById('expCsv').addEventListener('click', e => {
+      const b = e.currentTarget; if (isBusy(b)) return;
+      setBusy(b, true);
+      // let the spinner paint before the (synchronous) CSV build
+      setTimeout(() => {
+        try {
+          const cell = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+          const lines = [cols.map(c => cell(c.label)).join(',')];
+          for (const i of rows) lines.push(cols.map(c => cell(c.csv ? c.csv(i) : c.get(i))).join(','));
+          const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `co_explorer_${rows.length}_rows.csv`; a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+          toast(`Exported ${fmt(rows.length)} rows`);
+        } finally { setBusy(b, false); }
+      }, 50);
     });
   });
   if (q) setTimeout(() => { const x = document.getElementById('expQ'); if (x) { x.focus(); x.setSelectionRange(x.value.length, x.value.length); } }, 0);
@@ -785,7 +793,7 @@ function pageAbout() {
 
 function notFound(what) {
   setCrumbs([{ label: 'Not found' }]);
-  return `<div class="empty"><h3>${esc(what)} was not found</h3><p>It may not appear in this extract. Try the search (⌘K).</p><a class="btn primary" style="line-height:28px;display:inline-block" href="${link('/')}">Back to overview</a></div>`;
+  return `<div class="empty"><h3>${esc(what)} was not found</h3><p>It may not appear in this extract. Try the search (⌘K).</p>${btn({ label: 'Back to overview', variant: 'primary', size: 'lg', href: link('/') })}</div>`;
 }
 
 /* ======================================================= Router */
@@ -833,7 +841,7 @@ function boot() {
       const id = tb.dataset.tbl, box = document.getElementById(id + '-tbl'), chart = document.getElementById(id), tbl = TABLES[id];
       const show = box.hidden;
       if (show && tbl) box.innerHTML = simpleTable(tbl.head, tbl.rows.map(r => r.map(c => (typeof c === 'string' && c.startsWith('<')) ? c : esc(c))), tbl.num || []);
-      box.hidden = !show; chart.hidden = show; tb.textContent = show ? 'View as chart' : 'View as table'; tb.setAttribute('aria-expanded', show);
+      box.hidden = !show; chart.hidden = show; tb.querySelector('.btn-label').textContent = show ? 'View as chart' : 'View as table'; tb.setAttribute('aria-expanded', show);
       if (!show) CHARTS.forEach(c => c.getDom() === chart && c.resize());
     }
     if (e.target.closest('[data-reset]')) setFilters({});
@@ -845,10 +853,13 @@ function boot() {
     else if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName)) { e.preventDefault(); openSearch(); }
     else if (e.key === 'Escape') closeSearch();
   });
-  document.getElementById('themeBtn').addEventListener('click', () => {
+  const themeBtn = document.getElementById('themeBtn');
+  themeBtn.setAttribute('aria-pressed', (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark');
+  themeBtn.addEventListener('click', e => {
     const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
+    e.currentTarget.setAttribute('aria-pressed', next === 'dark');
     try { localStorage.setItem('coex-theme', next); } catch (e) {}
     render();
   });

@@ -15,12 +15,12 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
-  <button class="icon-btn nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+  <button type="button" class="btn btn-ghost btn-icon nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false" aria-controls="sidenav"><span class="btn-ico" aria-hidden="true">☰</span></button>
   <a class="brand" href="#/">CO Explorer</a>
-  <button class="search-btn" id="searchBtn" aria-label="Search (Command K)">
+  <button type="button" class="search-btn" id="searchBtn" aria-label="Search (Command K)">
     <span>Search address, BIN, BBL, job, CO, ZIP…</span><kbd>⌘K</kbd>
   </button>
-  <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+  <button type="button" class="btn btn-ghost btn-icon" id="themeBtn" aria-label="Dark mode" aria-pressed="false"><span class="btn-ico" aria-hidden="true">◐</span></button>
 </header>
 
 <div class="layout">
@@ -81,6 +81,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 <script src="data/co_data.js" defer></script>
+<script src="assets/buttons.js" defer></script>
 <script src="assets/core.js" defer></script>
 <script src="assets/pages.js" defer></script>
 </body>

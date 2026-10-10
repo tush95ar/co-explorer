@@ -281,7 +281,7 @@ function chartCard({ id, title, sub, height = 280, span = 6, hint = HINT_DRILL, 
   if (table) TABLES[id] = table;
   return `<section class="card span-${span}" aria-labelledby="${id}-h">
     <div class="card-head"><div><h3 id="${id}-h">${esc(title)}</h3>${sub ? `<div class="sub">${sub}</div>` : ''}</div>
-      <div class="card-tools">${extraTools}${table ? `<button class="linkbtn" data-tbl="${id}" aria-expanded="false">View as table</button>` : ''}</div></div>
+      <div class="card-tools">${extraTools}${table ? btn({ label: 'View as table', variant: 'ghost', size: 'sm', attrs: `data-tbl="${id}" aria-expanded="false"` }) : ''}</div></div>
     ${legend}
     <div class="chart" id="${id}" style="height:${height}px" role="img" aria-label="${esc(title)} chart"></div>
     <div class="alt-table" id="${id}-tbl" hidden></div>
@@ -305,7 +305,7 @@ function rankTable(items, { label = 'Name', value = 'COs', max = 10, extra } = {
   </tbody></table></div>`;
 }
 function emptyState(msg = 'No COs match these filters') {
-  return `<div class="empty"><h3>${esc(msg)}</h3><p>Try widening the date range or removing a filter.</p><button class="btn primary" data-reset>Reset filters</button></div>`;
+  return `<div class="empty"><h3>${esc(msg)}</h3><p>Try widening the date range or removing a filter.</p>${btn({ label: 'Reset filters', variant: 'primary', size: 'lg', attrs: 'data-reset' })}</div>`;
 }
 
 function makeChart(id, option, { onClick, onShift, onEvent } = {}) {
@@ -588,7 +588,7 @@ function renderFilterBar() {
   const open = el.classList.contains('open');
   el.innerHTML = `
     <div class="fb-row">
-      <button class="btn fb-toggle" id="fbToggle" aria-expanded="${open}">Filters${chips.length ? ` (${chips.length})` : ''}</button>
+      ${btn({ label: `Filters${chips.length ? ` (${chips.length})` : ''}`, cls: 'fb-toggle', attrs: `id="fbToggle" aria-expanded="${open}"` })}
     </div>
     <div class="fb-row collapsible">
       <label>From<select id="fFrom" aria-label="Issued from month">${opt('', 'Start')}${months.map(m => opt(ymLabel(m), ymShort(m), F.from === m)).join('')}</select></label>
@@ -597,10 +597,10 @@ function renderFilterBar() {
       <label>Job type<select id="fType">${opt('', 'All')}${DICT.jtg.map((b, k) => opt(b, b, F.type === k)).join('')}</select></label>
       <label>Filing type<select id="fFt">${opt('', 'All')}${DICT.ft.map((b, k) => opt(b, b, F.ft === k)).join('')}</select></label>
       <label>Units<select id="fUnits">${opt('', 'All')}${UB_KEYS.map((b, k) => opt(b, UB_LABELS[k], F.units === k)).join('')}</select></label>
-      <button class="btn" id="fReset">Reset</button>
-      <button class="btn" id="fCopy">Copy link</button>
+      ${btn({ label: 'Reset', variant: 'danger', attrs: 'id="fReset"' })}
+      ${btn({ label: 'Copy link', attrs: 'id="fCopy"' })}
     </div>
-    <div class="chips" aria-label="Active filters">${chips.map(([k, l]) => `<span class="chip">${esc(l)}<button aria-label="Remove ${esc(l)} filter" data-chip="${k}">×</button></span>`).join('')}</div>`;
+    <div class="chips" aria-label="Active filters">${chips.map(([k, l]) => `<span class="chip">${esc(l)}${btn({ label: `Remove ${esc(l)} filter`, variant: 'ghost', size: 'sm', iconOnly: true, icon: '×', attrs: `data-chip="${k}"` })}</span>`).join('')}</div>`;
   const read = () => {
     const nf = {};
     const v = id => document.getElementById(id).value;
@@ -615,9 +615,9 @@ function renderFilterBar() {
   };
   el.querySelectorAll('select').forEach(s => s.addEventListener('change', read));
   el.querySelector('#fReset').addEventListener('click', () => setFilters({}));
-  el.querySelector('#fCopy').addEventListener('click', () => {
-    const url = location.href;
-    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast('Link copied'), () => { prompt('Copy this link', url); });
+  el.querySelector('#fCopy').addEventListener('click', e => {
+    const b = e.currentTarget, url = location.href;
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => { flashDone(b, 'Copied ✓'); toast('Link copied'); }, () => { prompt('Copy this link', url); });
   });
   el.querySelector('#fbToggle').addEventListener('click', () => { el.classList.toggle('open'); el.querySelector('#fbToggle').setAttribute('aria-expanded', el.classList.contains('open')); });
   el.querySelectorAll('[data-chip]').forEach(b => b.addEventListener('click', () => {

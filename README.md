@@ -27,7 +27,9 @@ python3 -m http.server 8765
 | `index.html` | Shell: top bar, side nav, filter bar, search modal |
 | `assets/core.js` | Data model, derived fields, indexes, filters + URL state, chart/map/table components, search |
 | `assets/pages.js` | All pages and the hash router |
-| `assets/styles.css` | Theme tokens (light/dark), layout, responsive rules |
+| `assets/styles.css` | Theme tokens (light/dark), layout, responsive rules, button system |
+| `assets/buttons.js` | Button component helpers: `btn()`, `setBusy()`, `flashDone()` |
+| `buttons.html` | Button style guide: every variant × size × state |
 
 ## Global behavior
 
@@ -91,6 +93,58 @@ Analysis pages, lists and the explorer also accept `?scope=<kind>:<key>` (e.g. `
 - Filtering and aggregation run on the main thread over typed-array columns. Filtering all 82k rows takes ~4 ms, and page renders take ~50–200 ms. That made a Web Worker and pre-aggregated cubes unnecessary, and keeps `file://` working (workers are blocked there).
 - Maps cluster buildings (not individual COs) with Leaflet.markercluster. They load in short chunks and bind tooltips on hover, so the citywide map (24.5k buildings) doesn't block the page.
 - Library versions are pinned: ECharts 5.5.0, Leaflet 1.9.4, Leaflet.markercluster 1.5.3.
+
+## Design notes: button system
+
+All controls share one component. Its styles are the `buttons` section of `assets/styles.css`, and the markup comes from `btn()` in `assets/buttons.js`. See every variant, size and state side by side at [`buttons.html`](buttons.html) ([live](https://tush95ar.github.io/co-explorer/buttons.html)).
+
+```js
+btn({ label, variant: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger', size: 'sm' | 'md' | 'lg',
+      href,            // → <a class="btn"> for navigation; otherwise <button type="button">
+      icon, iconRight, iconOnly, block, cls, attrs })
+setBusy(el, true|false)       // spinner overlay + aria-busy; the button keeps its width
+flashDone(el, 'Copied ✓')     // brief success overlay, reverts after 1.5 s
+```
+
+**Performance choices**
+- **Only `transform` and `opacity` animate.** The hover tint (`::before`) and lift shadow (`::after`) are pre-painted layers that fade in, so no `box-shadow` or `background` transitions trigger repaints.
+- **Zero layout shift.** Every variant reserves a 1px border (transparent on ghost buttons). Loading and success text overlays the label instead of replacing it.
+- **No `will-change`.** The layers are tiny and animate for 160 ms. Promoting them permanently would cost more memory than it saves.
+- **Hover sits inside `@media (hover: hover) and (pointer: fine)`**, so touch screens never get stuck hover states. The press state (`scale(.97)`, 90 ms) still gives touch feedback.
+- **CSS does all the effects.** JS only toggles the busy and done states.
+
+**Accessibility**
+- The focus ring (2px `--focus` outline with a 2px offset) shows only for keyboard focus (`:focus-visible`), never on mouse clicks.
+- **Touch targets:** under `pointer: coarse`, an invisible `::before` grows the hit area to at least 44×44 px (chip ×, icon buttons, small buttons, sort headers). The desktop layout stays dense.
+- `prefers-reduced-motion` removes all transforms, and the spinner becomes an opacity pulse. `forced-colors` mode falls back to system `ButtonText`/`ButtonFace`/`Highlight` colors.
+- Toggles expose their state with `aria-expanded` ("View as table", Columns, nav) or `aria-pressed` (theme), and show a persistent "on" style.
+
+**Measured contrast (WCAG AA)**
+
+| | Light | Dark |
+|---|---|---|
+| Primary text on fill | 5.39:1 (`#fff` on `#256abf`) | 9.33:1 (`#0b0b0b` on `#86b6ef`) |
+| Secondary / outline text | 19.17:1 | 17.42:1 |
+| Ghost text | 6.46:1 | 8.25:1 |
+| Danger text | 6.40:1 | 7.90:1 |
+| Outline border vs surface / page | 3.33:1 (min) | 3.41:1 |
+| Danger border | 3.57:1 (min) | 4.20:1 |
+| Disabled text | 3.21:1 | 4.41:1 |
+
+The old primary (`#2a78d6`, 4.42:1 light, 3.64:1 dark) failed AA and has been replaced.
+
+**Re-theming.** Change the tokens in `:root` and in both dark-mode blocks (`:root[data-theme="dark"]` and the `prefers-color-scheme` block):
+
+| Token | Controls |
+|---|---|
+| `--btn-radius`, `--btn-h-sm/md/lg`, `--btn-pad-x` | Shape and size |
+| `--dur-fast`, `--dur`, `--ease-out` | Motion timing (press, hover) |
+| `--btn-primary-bg`, `--btn-primary-fg` | Primary fill and label |
+| `--btn-outline-border`, `--btn-danger-fg`, `--btn-danger-border` | Outline and destructive colors |
+| `--btn-tint`, `--btn-tint-strong`, `--btn-tint-danger` | Hover/press tint layers |
+| `--btn-on-bg`, `--btn-disabled-bg`, `--btn-disabled-fg`, `--btn-shadow` | Toggled-on, disabled and lift shadow |
+
+Button colors never reuse the chart tokens (`--jt-*`, `--ft-*`, `--s-*`, `--seq*`), which are validated for color-blind safety separately.
 
 ## License
 

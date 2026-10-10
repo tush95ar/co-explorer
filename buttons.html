@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Button System</title>
+<meta name="description" content="CO Explorer button component: every variant, size and state side by side.">
+<link rel="stylesheet" href="assets/styles.css">
+<script>
+  try { const t = localStorage.getItem('coex-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<style>
+  /* Demo-only: freeze interaction states so they can be compared side by side.
+     These mirror the real :hover / :focus-visible / :active rules in styles.css. */
+  .demo .is-hover::before { opacity: 1; }
+  .demo .is-hover:not(.btn-ghost) { transform: translateY(-1px); }
+  .demo .is-hover:not(.btn-ghost)::after { opacity: 1; }
+  .demo .is-focus { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .demo .is-active { transform: scale(.97); }
+  .demo .is-active::before { opacity: 1; }
+
+  .sg { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  .sg h1 { margin-bottom: 4px; }
+  .sg h2 { margin-top: 32px; }
+  .sg .lead { color: var(--text-2); margin: 0 0 8px; }
+  .matrix { overflow-x: auto; }
+  .matrix table { border-collapse: separate; border-spacing: 0; min-width: 760px; }
+  .matrix th { font-size: 12px; color: var(--text-3); font-weight: 600; text-align: left; padding: 8px 12px; white-space: nowrap; }
+  .matrix td { padding: 12px; vertical-align: middle; border-top: 1px solid var(--grid); }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .narrow { max-width: 320px; }
+  .sg code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+  .head-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<main class="sg demo" id="main">
+  <div class="head-row">
+    <div>
+      <h1>Button system</h1>
+      <p class="lead">One component for every control in <a href="index.html">CO Explorer</a>. Hover, focus and press states are frozen below for comparison; the <em>Try it</em> section is live.</p>
+    </div>
+    <button type="button" class="btn btn-secondary" id="themeBtn" aria-pressed="false"><span class="btn-ico" aria-hidden="true">◐</span><span class="btn-label">Dark mode</span></button>
+  </div>
+
+  <h2>Variants × states</h2>
+  <section class="card matrix" aria-label="Variants by state"><div id="matrix"></div></section>
+
+  <h2>Sizes</h2>
+  <section class="card"><div class="row" id="sizes"></div></section>
+
+  <h2>Options</h2>
+  <section class="card">
+    <div class="row" id="options"></div>
+    <div class="narrow" style="margin-top:12px" id="block"></div>
+  </section>
+
+  <h2>Toggles and chips</h2>
+  <section class="card"><div class="row" id="toggles"></div></section>
+
+  <h2>Try it (live)</h2>
+  <section class="card">
+    <div class="row" id="live"></div>
+    <p class="note">Tab through to see the keyboard focus ring (it never appears on mouse click). Loading and success states overlay the label, so the button width never changes.</p>
+  </section>
+
+  <h2>KPI tile (card hover)</h2>
+  <section class="kpis" style="max-width:520px">
+    <a class="kpi" href="index.html"><div class="lbl">Certificates issued</div><div class="val">82,806</div><div class="cmp">Hover me</div></a>
+    <div class="kpi"><div class="lbl">Not a link</div><div class="val">—</div><div class="cmp">No hover lift</div></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/buttons.js"></script>
+<script>
+  const VARIANTS = ['primary', 'secondary', 'outline', 'ghost', 'danger'];
+  const STATES = [
+    ['Default', ''], ['Hover', 'is-hover'], ['Focus', 'is-focus'], ['Active', 'is-active'],
+    ['Disabled', 'disabled'], ['Loading', 'busy'], ['Done', 'done'],
+  ];
+  const cell = (variant, state) => {
+    const attrs = state === 'disabled' ? 'disabled tabindex="-1"' : 'tabindex="-1"';
+    const cls = ['is-hover', 'is-focus', 'is-active'].includes(state) ? state : '';
+    return btn({ label: 'Export CSV', variant, cls, attrs: `${attrs} data-state="${state}"` });
+  };
+  document.getElementById('matrix').innerHTML = `<table>
+    <thead><tr><th>Variant</th>${STATES.map(([l]) => `<th>${l}</th>`).join('')}</tr></thead>
+    <tbody>${VARIANTS.map(v => `<tr><th><code>btn-${v}</code></th>${STATES.map(([, st]) => `<td>${cell(v, st)}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+  document.querySelectorAll('[data-state="busy"]').forEach(b => setBusy(b, true));
+  document.querySelectorAll('[data-state="done"]').forEach(b => { btnStatus(b, 'Done ✓'); b.classList.add('is-done'); });
+
+  document.getElementById('sizes').innerHTML = ['sm', 'md', 'lg'].map(size =>
+    VARIANTS.slice(0, 2).map(v => btn({ label: `${v} · ${size}`, variant: v, size })).join('')).join('');
+
+  document.getElementById('options').innerHTML = [
+    btn({ label: 'Export CSV', icon: '↓' }),
+    btn({ label: 'Next at building', iconRight: '→' }),
+    btn({ label: 'Previous at building', icon: '←', variant: 'outline' }),
+    btn({ label: 'Open navigation', icon: '☰', iconOnly: true, variant: 'ghost' }),
+    btn({ label: 'Remove filter', icon: '×', iconOnly: true, variant: 'ghost', size: 'sm' }),
+    btn({ label: 'Open link (anchor)', href: '#', variant: 'secondary' }),
+  ].join('');
+  document.getElementById('block').innerHTML = btn({ label: 'Apply filters (full width)', variant: 'primary', block: true });
+
+  document.getElementById('toggles').innerHTML = `
+    ${btn({ label: 'View as table', variant: 'ghost', size: 'sm', attrs: 'aria-expanded="false" data-toggle' })}
+    ${btn({ label: 'Columns (11)', attrs: 'aria-expanded="false" data-toggle' })}
+    <span class="chip">Brooklyn${btn({ label: 'Remove Brooklyn filter', icon: '×', iconOnly: true, variant: 'ghost', size: 'sm' })}</span>
+    <span class="chip">New Building${btn({ label: 'Remove New Building filter', icon: '×', iconOnly: true, variant: 'ghost', size: 'sm' })}</span>`;
+  document.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-expanded', b.getAttribute('aria-expanded') !== 'true')));
+
+  const toast = msg => { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800); };
+  document.getElementById('live').innerHTML = `
+    ${btn({ label: 'Export CSV (82,806 rows)', icon: '↓', attrs: 'id="liveBusy"' })}
+    ${btn({ label: 'Copy link', attrs: 'id="liveCopy"' })}
+    ${btn({ label: 'Reset', variant: 'danger', attrs: 'id="liveReset"' })}
+    ${btn({ label: 'Add', variant: 'primary', attrs: 'id="liveAdd"' })}
+    ${btn({ label: 'Add (disabled)', variant: 'primary', attrs: 'disabled' })}`;
+  document.getElementById('liveBusy').addEventListener('click', e => {
+    const b = e.currentTarget; if (isBusy(b)) return;
+    setBusy(b, true); setTimeout(() => { setBusy(b, false); toast('Exported 82,806 rows (demo)'); }, 1500);
+  });
+  document.getElementById('liveCopy').addEventListener('click', e => { flashDone(e.currentTarget, 'Copied ✓'); toast('Link copied (demo)'); });
+  document.getElementById('liveReset').addEventListener('click', () => toast('Filters reset (demo)'));
+  document.getElementById('liveAdd').addEventListener('click', () => toast('Added (demo)'));
+
+  const themeBtn = document.getElementById('themeBtn');
+  const isDark = () => (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+  themeBtn.setAttribute('aria-pressed', isDark());
+  themeBtn.addEventListener('click', () => {
+    const next = isDark() ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    themeBtn.setAttribute('aria-pressed', next === 'dark');
+    try { localStorage.setItem('coex-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>
