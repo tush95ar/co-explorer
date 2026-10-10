@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CO Explorer</title>
+<meta name="description" content="Interactive, cross-linked explorer for NYC DOB NOW Certificates of Occupancy (2021–2026).">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<link rel="stylesheet" href="assets/styles.css">
+<script>
+  try { const t = localStorage.getItem('coex-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <button class="icon-btn nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false">☰</button>
+  <a class="brand" href="#/">CO Explorer</a>
+  <button class="search-btn" id="searchBtn" aria-label="Search (Command K)">
+    <span>Search address, BIN, BBL, job, CO, ZIP…</span><kbd>⌘K</kbd>
+  </button>
+  <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+</header>
+
+<div class="layout">
+  <nav class="sidenav" id="sidenav" aria-label="Pages">
+    <div class="nav-group">
+      <a data-nav="/" href="#/">Overview</a>
+    </div>
+    <div class="nav-group">
+      <h4>Browse</h4>
+      <a data-nav="/list/borough" href="#/list/borough">Boroughs</a>
+      <a data-nav="/list/cb" href="#/list/cb">Community boards</a>
+      <a data-nav="/list/council" href="#/list/council">Council districts</a>
+      <a data-nav="/list/zip" href="#/list/zip">ZIP codes</a>
+      <a data-nav="/list/nta" href="#/list/nta">Neighborhoods</a>
+      <a data-nav="/list/street" href="#/list/street">Streets</a>
+      <a data-nav="/list/lot" href="#/list/lot">Tax lots</a>
+      <a data-nav="/list/building" href="#/list/building">Buildings</a>
+      <a data-nav="/list/job" href="#/list/job">Jobs</a>
+    </div>
+    <div class="nav-group">
+      <h4>Analyze</h4>
+      <a data-nav="/processing" href="#/processing">Processing time</a>
+      <a data-nav="/renewals" href="#/renewals">Renewal patterns</a>
+      <a data-nav="/housing" href="#/housing">Housing pipeline</a>
+      <a data-nav="/compare" href="#/compare">Compare</a>
+      <a data-nav="/explorer" href="#/explorer">Data explorer</a>
+    </div>
+    <div class="nav-group">
+      <a data-nav="/about" href="#/about">About the data</a>
+    </div>
+  </nav>
+
+  <div class="content">
+    <div class="filterbar" id="filterbar" role="region" aria-label="Global filters"></div>
+    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+    <main id="main" tabindex="-1">
+      <div class="skeleton-page" aria-busy="true" aria-label="Loading data">
+        <div class="sk sk-title"></div>
+        <div class="sk-row"><div class="sk sk-tile"></div><div class="sk sk-tile"></div><div class="sk sk-tile"></div><div class="sk sk-tile"></div></div>
+        <div class="sk sk-chart"></div>
+        <p class="muted">Loading 82,806 certificates…</p>
+      </div>
+    </main>
+    <footer class="foot" id="foot"></footer>
+  </div>
+</div>
+
+<div class="search-modal" id="searchModal" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search">
+    <input id="searchInput" type="search" placeholder="Type an address, BIN, BBL, job #, CO #, neighborhood or ZIP" autocomplete="off" aria-controls="searchResults">
+    <ul id="searchResults" role="listbox"></ul>
+    <p class="search-hint">↑ ↓ to move · Enter to open · Esc to close</p>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script src="data/co_data.js" defer></script>
+<script src="assets/core.js" defer></script>
+<script src="assets/pages.js" defer></script>
+</body>
+</html>
