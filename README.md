@@ -91,3 +91,7 @@ Analysis pages, lists and the explorer also accept `?scope=<kind>:<key>` (e.g. `
 - Filtering and aggregation run on the main thread over typed-array columns. Filtering all 82k rows takes ~4 ms, and page renders take ~50–200 ms. That made a Web Worker and pre-aggregated cubes unnecessary, and keeps `file://` working (workers are blocked there).
 - Maps cluster buildings (not individual COs) with Leaflet.markercluster. They load in short chunks and bind tooltips on hover, so the citywide map (24.5k buildings) doesn't block the page.
 - Library versions are pinned: ECharts 5.5.0, Leaflet 1.9.4, Leaflet.markercluster 1.5.3.
+
+## License
+
+Code: [MIT](LICENSE). The certificate data in `DOB_NOW__Certificate_of_Occupancy_20261010.csv` (and the derived `data/co_data.js`) is NYC Open Data from the NYC Department of Buildings and is not covered by this license; see the [NYC Open Data terms of use](https://opendata.cityofnewyork.us/overview/#termsofuse).
