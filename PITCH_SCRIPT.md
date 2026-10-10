@@ -1,7 +1,8 @@
 # CO Explorer — Pitch Script
 
 **Length:** ~6 minutes plus Q&A · **Format:** spoken, with a live demo
-**Setup before you start:** open the dashboard at the Overview page (`#/`), light mode, filters cleared. Have a second tab ready at `#/processing`.
+**Live dashboard:** https://tush95ar.github.io/co-explorer/ · **Code:** https://github.com/tush95ar/co-explorer
+**Setup before you start:** open the dashboard at the Overview page (https://tush95ar.github.io/co-explorer/), light mode, filters cleared. Have a second tab ready at https://tush95ar.github.io/co-explorer/#/processing.
 
 > Stage directions are in *[brackets]*. Spoken lines are plain text. Every number below comes from the dashboard itself, so you can show it live.
 
@@ -91,7 +92,11 @@ CO Explorer runs in any browser with nothing to install, rebuilds from a new dat
 - Give us **two weeks with your team**: we'll load the latest extract and build the three views you check most.
 - Or: **let us host it internally**, so anyone with the link can use it.
 
+It's live right now at **tush95ar.github.io/co-explorer**. Open it on your phone while we talk.
+
 Thank you. Who wants to pick a building?
+
+*[Leave the link on screen during Q&A.]*
 
 *[Hand someone the ⌘K search. Letting the audience pick an address is the strongest finish.]*
 
@@ -99,7 +104,7 @@ Thank you. Who wants to pick a building?
 
 ## 60-second version (elevator / hallway)
 
-> NYC has issued 82,806 Certificates of Occupancy since 2021, covering 24,500 buildings. The public data is a messy spreadsheet: five spellings of the same job type, ten spellings of Fifth Avenue. CO Explorer turns it into a dashboard where every number is a link. Start citywide, click into a borough, a neighborhood, a building, a single certificate. Filters follow you and every view is a shareable link. In one click it shows that Manhattan, which looks fastest at a 1-day median, is actually the slowest borough for Final certificates: a median of 61 days, about four times Staten Island's 15. It runs in any browser and rebuilds from the next data release with one command. Can I show you your district?
+> NYC has issued 82,806 Certificates of Occupancy since 2021, covering 24,500 buildings. The public data is a messy spreadsheet: five spellings of the same job type, ten spellings of Fifth Avenue. CO Explorer turns it into a dashboard where every number is a link. Start citywide, click into a borough, a neighborhood, a building, a single certificate. Filters follow you and every view is a shareable link. In one click it shows that Manhattan, which looks fastest at a 1-day median, is actually the slowest borough for Final certificates: a median of 61 days, about four times Staten Island's 15. It runs in any browser and rebuilds from the next data release with one command. Can I show you your district? It's live at tush95ar.github.io/co-explorer.
 
 ---
 
@@ -107,6 +112,7 @@ Thank you. Who wants to pick a building?
 
 | Likely question | Answer |
 |---|---|
+| *Where can I try it?* | Live at https://tush95ar.github.io/co-explorer/. The code is open source (MIT) at https://github.com/tush95ar/co-explorer. |
 | *Where does the data come from?* | NYC DOB NOW: Certificate of Occupancy open data, extract dated Oct 10 2026. All 82,806 rows are used. |
 | *How current is it?* | As current as the latest extract. Rerun `prepare_data.py` on a new CSV and reload. The latest month is labeled as partial. |
 | *Is the 525k units figure double-counted?* | No. Each building is counted once, using its latest certificate. The housing page is stricter: new buildings with a Final CO only (~139k units). |
@@ -123,6 +129,7 @@ Thank you. Who wants to pick a building?
 
 - [ ] Filters cleared and Overview loaded before you start
 - [ ] Internet on (charts and map tiles load from a CDN)
+- [ ] Live link on your closing slide, or as a QR code: https://tush95ar.github.io/co-explorer/
 - [ ] Rehearse the Processing Time "aha" (Filing type = Final) — it's the moment people remember
 - [ ] Pick a backup building address in case the audience goes quiet
 - [ ] Zoom the browser to 110–125% if presenting on a projector
